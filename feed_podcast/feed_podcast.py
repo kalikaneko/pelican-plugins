@@ -44,15 +44,12 @@ class PodcastWriter(Writer):
         else:
             feed_title = context['SITENAME']
         feed = FeedGenerator()
-        feed.id('http://lernfunk.de/media/654321')
-        feed.title('Some Testfeed')
+        feed.id('http://eldesarmador.org/media/4242')
+        feed.title(feed_title)
         feed.load_extension('podcast')
-        feed.link(href='http://larskiesow.de/podcast.xml', rel='self')
-        #title=Markup(feed_title).striptags())
-        #feed_url=self.feed_url)
-        #link=(self.site_url + '/'),
-        #description=context.get('SITESUBTITLE', ''))
+        feed.link(href='http://eldesarmador.org/podcast.xml', rel='self')
         # TODO GET FROM CONFIG
+        #description=context.get('SITESUBTITLE', ''))
         feed.podcast.itunes_category('Technology', 'Podcasting')
         return feed
 
@@ -60,21 +57,22 @@ class PodcastWriter(Writer):
         title = Markup(item.title).striptags()
 
         link = '%s/%s' % (self.site_url, item.url)
-        description = item.summary if hasattr(item, 'summary') else item.get_content(self.site_url)
+        description = item.podcastsummary if hasattr(item, 'podcastsummary') else ''
+	date = item.date
         
         try:
             audio = item.audio
         except:
-            print "no audio!"
-            audio = None
+            print "no audio, no entry!"
+            return
 
         entry = feed.add_entry()
         entry.id(link)
         entry.title(title)
+        entry.updated(date)
         entry.description(
             {'type': 'xhtml', 'content': description})
-        if audio:
-            entry.enclosure(audio, 0, 'audio/mpeg')
+        entry.enclosure(audio, 0, 'audio/mpeg')
 
     def write_feed(self, elements, context, path=None, feed_type='atom',
                    override_output=False, feed_title=None):
