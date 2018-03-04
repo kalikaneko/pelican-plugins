@@ -54,7 +54,7 @@ class PodcastWriter(Writer):
         feed.subtitle('Un programa sobre tecnologia y libertad')
         feed.language('es')
         # TODO GET FROM CONFIG
-        #description=context.get('SITESUBTITLE', ''))
+        # description=context.get('SITESUBTITLE', ''))
         return feed
 
     def _load_podcast(self, feed):
@@ -76,10 +76,10 @@ class PodcastWriter(Writer):
         try:
             audio = item.audio
         except:
-            print "no audio, no entry!"
+            print("no audio, no entry!")
             return
 
-        print "processing", link
+        print("processing", link)
 
         entry = feed.add_entry()
         entry.id(link)
@@ -135,7 +135,7 @@ class PodcastWriter(Writer):
             logger.info('Writing %s', complete_path)
             
             feed.atom_file(complete_path, pretty=True, encoding=encoding)
-            print "done"
+            print("done")
             signals.feed_written.send(
                 complete_path, context=context, feed=feed)
 
