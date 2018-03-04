@@ -71,7 +71,7 @@ class PodcastWriter(Writer):
 
         link = '%s/%s' % (self.site_url, item.url)
         description = item.podcastsummary if hasattr(item, 'podcastsummary') else ''
-	date = item.date
+        date = item.date
         
         try:
             audio = item.audio
