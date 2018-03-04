@@ -45,13 +45,26 @@ class PodcastWriter(Writer):
             feed_title = context['SITENAME']
         feed = FeedGenerator()
         feed.id('http://eldesarmador.org/media/4242')
+        feed.rights('cc-by-nc')
         feed.title(feed_title)
-        feed.load_extension('podcast')
         feed.link(href='http://eldesarmador.org/podcast.xml', rel='self')
+        feed.author({'name': 'La Imilla Hacker', 'email': 'imilla.hacker@riseup.net'})
+        feed.logo('https://eldesarmador.org/theme/img/imilla_hacker_1.png')
+        feed.icon('https://eldesarmador.org/theme/img/imilla_hacker_1.png')
+        feed.subtitle('Un programa sobre tecnologia y libertad')
+        feed.language('es')
         # TODO GET FROM CONFIG
         #description=context.get('SITESUBTITLE', ''))
-        feed.podcast.itunes_category('Technology', 'Podcasting')
         return feed
+
+    def _load_podcast(self, feed):
+        feed.load_extension('podcast', atom=True)
+        feed.podcast.itunes_category('Technology', 'Podcasting')
+        feed.podcast.itunes_author('La Imilla Hacker')
+        feed.podcast.itunes_explicit('no')
+        feed.podcast.itunes_complete('no')
+        return feed
+
 
     def _add_item_to_the_feed(self, feed, item):
         title = Markup(item.title).striptags()
@@ -66,12 +79,13 @@ class PodcastWriter(Writer):
             print "no audio, no entry!"
             return
 
+        print "processing", link
+
         entry = feed.add_entry()
         entry.id(link)
         entry.title(title)
         entry.updated(date)
-        entry.description(
-            {'type': 'xhtml', 'content': description})
+        entry.description(description)
         entry.enclosure(audio, 0, 'audio/mpeg')
 
     def write_feed(self, elements, context, path=None, feed_type='atom',
@@ -107,6 +121,9 @@ class PodcastWriter(Writer):
         for i in range(max_items):
             self._add_item_to_the_feed(feed, elements[i])
 
+
+        feed = self._load_podcast(feed)
+
         if path:
             complete_path = os.path.join(self.output_path, path)
             try:
@@ -117,10 +134,11 @@ class PodcastWriter(Writer):
             encoding = 'utf-8' if six.PY3 else None
             logger.info('Writing %s', complete_path)
             
-            #import ipdb; ipdb.set_trace()
             feed.atom_file(complete_path, pretty=True, encoding=encoding)
+            print "done"
             signals.feed_written.send(
                 complete_path, context=context, feed=feed)
+
         return feed
 
 
