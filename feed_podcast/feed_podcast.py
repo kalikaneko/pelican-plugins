@@ -85,7 +85,10 @@ class PodcastWriter(Writer):
         entry.id(link)
         entry.title(title)
         entry.updated(date)
-        entry.description(description)
+        if six.PY3:
+            entry.description({'type': 'xhtml', 'content': description})
+        else:
+            entry.description(description)
         entry.enclosure(audio, 0, 'audio/mpeg')
 
     def write_feed(self, elements, context, path=None, feed_type='atom',
